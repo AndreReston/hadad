@@ -1,0 +1,500 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1
+-- Generation Time: Feb 20, 2026 at 01:16 AM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `computer_parts_store`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `categories`
+--
+
+CREATE TABLE `categories` (
+  `id` int(11) NOT NULL,
+  `name` varchar(50) NOT NULL,
+  `description` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `categories`
+--
+
+INSERT INTO `categories` (`id`, `name`, `description`) VALUES
+(1, 'CPU (Processor)', NULL),
+(2, 'Motherboard', NULL),
+(3, 'RAM (Memory)', NULL),
+(4, 'GPU (Graphics Card / Video Card)', NULL),
+(5, 'Power Supply (PSU)', NULL),
+(6, 'Storage (HDD / SSD / NVMe)', NULL),
+(7, 'Cooling Systems (Air & Liquid Coolers)', NULL),
+(8, 'Keyboard', NULL),
+(9, 'Mouse', NULL),
+(10, 'Monitor', NULL),
+(11, 'Headset / Microphone', NULL),
+(12, 'Webcam', NULL),
+(13, 'PC Cases / Chassis', NULL),
+(14, 'Case Fans & RGB Lighting', NULL),
+(15, 'Cables & Adapters', NULL),
+(16, 'Thermal Paste / Heat Sinks', NULL),
+(17, 'Routers & Modems', NULL),
+(18, 'Network Cards', NULL),
+(19, 'USB Hubs & Extensions', NULL),
+(20, 'Gaming Controllers', NULL),
+(21, 'VR Gear', NULL),
+(22, 'Capture Cards / Streaming Equipment', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `inventory`
+--
+
+CREATE TABLE `inventory` (
+  `id` int(11) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  `quantity_change` int(11) NOT NULL,
+  `reason` enum('restock','sale','adjustment') NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `orders`
+--
+
+CREATE TABLE `orders` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  `price` decimal(10,2) NOT NULL,
+  `payment_method` varchar(50) NOT NULL,
+  `status` varchar(30) NOT NULL DEFAULT 'Paid',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `delivery_street` varchar(255) DEFAULT NULL,
+  `delivery_city` varchar(100) DEFAULT NULL,
+  `delivery_province` varchar(100) DEFAULT NULL,
+  `delivery_zip` varchar(20) DEFAULT NULL,
+  `distance_km` int(11) DEFAULT NULL,
+  `delivery_minutes` int(11) DEFAULT NULL,
+  `expected_delivery_datetime` datetime DEFAULT NULL,
+  `quantity` int(11) NOT NULL DEFAULT 1,
+  `staff_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `order_items`
+--
+
+CREATE TABLE `order_items` (
+  `id` int(11) NOT NULL,
+  `order_id` int(11) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  `quantity` int(11) NOT NULL,
+  `price` decimal(10,2) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `products`
+--
+
+CREATE TABLE `products` (
+  `id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `category_id` int(11) NOT NULL,
+  `description` text DEFAULT NULL,
+  `price` decimal(10,2) NOT NULL,
+  `stock_quantity` int(11) NOT NULL DEFAULT 0,
+  `image_url` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `products`
+--
+
+INSERT INTO `products` (`id`, `name`, `category_id`, `description`, `price`, `stock_quantity`, `image_url`, `created_at`) VALUES
+(1, 'Intel Core Ultra 9 285K CPU', 1, 'Elevate your PC with the Intel Core Ultra 9 285K, the pinnacle of desktop processing. Crush demanding workloads and achieve elite gaming performance with its 24-core architecture and a stunning 5.7 GHz max turbo frequency. This CPU introduces a powerful 3-part AI engine, including the dedicated Intel AI Boost NPU, to accelerate creative and AI tasks with remarkable efficiency. With support for blazing-fast DDR5 6400 memory, PCIe 5.0, and integrated graphics driving multiple 8K displays, the Core Ultra 9 285K is the ultimate engine for your high-end build\r\n\r\n', 320.00, 50, 'uploads/1770638416_1770099905_images.png', '2026-02-09 12:00:16'),
+(2, 'HP Gaming Headphones', 11, '•Ergonomic design & lightweight material for all-day comfort with self-adjusting padding headband & all-cover ear cups\r\n•LED lighting design that brings cool lights when plugged in, highlighting game atmosphere\r\n•Adjustable microphone reproduces voice with proper volume and clarity with 50mm speaker drivers\r\n•Stereo bass sound effect with 50mm audio drivers and advanced technology for intense gaming experiences\r\n•Multi-platform compatibility including PS4, Xbox, Nintendo Switch, PC, laptop, mobile phone, and more\r\n•Plug and play functionality for easy setup and use', 20.00, 25, 'uploads/1770639193_6606ad51fb8aaa2f3d48f98e-hp-gaming-headphones-with-microphone.jpg', '2026-02-09 12:13:13'),
+(3, 'LOGITECH G502 LIGHTSPEED WIRELESS RGB GAMING MOUSE', 9, 'G502 HERO features an advanced optical sensor for maximum tracking accuracy, customizable RGB lighting, custom game profiles, from 100 up to 25,600 DPI, and repositionable weights. HERO achieves competition-level precision and the most consistent responsiveness ever.', 95.00, 10, 'uploads/1770639664_mouse.jpg', '2026-02-09 12:21:04'),
+(5, 'ASUS ROG Swift 32” 4K OLED Gaming Monitor (PG32UCDM) - UHD (3840 x 2160), QD-OLED, 240Hz, 0.03ms, G-', 10, 'BrandASUSScreen Size32 InchesResolution4K UHD 2160pAspect Ratio16:9Screen Surface DescriptionMatte\r\n\r\nAbout this item\r\n\r\n32-inch 4K (3840 x 2160) QD-OLED gaming monitor with 240 Hz refresh rate and 0.03 ms (GTG) response time for immersive gaming\r\n\r\nHighly efficient custom heatsink, advanced airflow design, and graphene film for better heat management to reduce the risk of burn-in\r\n\r\nVESA DisplayHDR 400 True Black compliance, 99% DCI-P3 gamut, true 10-bit, and Delta E < 2 color difference for astonishing HDR performance\r\n\r\nOptional uniform brightness setting ensures consistent luminance levels\r\n\r\nDisplayWidget Center allows users to access OLED Care functions, as well as adjust monitor settings with a mouse\r\n\r\nPeak brightness may vary due to color pre-calibration', 2200.00, 15, 'uploads/1770640089_1704811349_1692603178869_1.jpg', '2026-02-09 12:28:09'),
+(6, 'Keyboard', 8, 'hjdgasjkbhkdhndasfjklsagbfjkasbcljkashdfouawhnklsanfcjklasbcgjksahdjlaslbhfvjlsanda', 200.00, 15, 'uploads/1770973572_sleek-mechanical-pc-keyboard-with-led-lighting_946696-2901.png', '2026-02-13 09:06:12'),
+(7, 'Laptop Fan', 14, '6 Fans Laptop Cooling Pad Adjustable Height Foldable Laptop Cooler Pad 9\"-17\" Led Light Height\r\n', 60.00, 20, 'uploads/1770974734_8-amazing-cooling-pad-for-gaming-laptop-for-2023-1701759472.jpg', '2026-02-13 09:25:34'),
+(8, 'MSI B75MA-P45', 2, 'MSI released details about its upcoming value socket LGA1155 motherboard, the B75MA-P45. MSI finds the B75 PCH a worthy option over the current-generation H61 PCH, and could hence price its B75-based motherboards competitively, to capture the entry-level LGA1155 market. The B75MA-P45 comes with out of the box support for 22 nm \"Ivy Bridge\" Core processors, apart from current-generation \"Sandy Bridge\" ones. The B75MA-P45 packs a simple 5-phase VRM to power the LGA1155 CPU. The CPU is wired to four DDR3 DIMM slots, supporting dual-channel DDR3-1600 MHz memory.\r\n\r\nExpansion slots include one PCI-Express 3.0 x16, one PCI-Express 2.0 x1, and a legacy PCI. The legacy PCI logic is reintegrated with the PCH, and so the board doesn\'t use any bridge chips, further, since USB 3.0 and SATA 6 Gb/s are integrated with the PCH, MSI didn\'t add third-party controllers handling the two. SATA connectivity includes one SATA 6 Gb/s, and five SATA 3 Gb/s. The PCH gives out four USB 3.0 ports, two of which are found on the rear panel, two via internal header. Display connectivity includes DVI and D-Sub. 6-channel HD audio, gigabit Ethernet, and legacy PS/2 connectors complete the package. The board is driven by UEFI firmware (5 MB ME 8.0), with a graphical setup program. The B75MA-P45 is said to capture a price-point under US $100.', 80.00, 10, 'uploads/1770977193_OIP (1).png', '2026-02-13 10:06:33');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `product_reviews`
+--
+
+CREATE TABLE `product_reviews` (
+  `id` int(11) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `rating` int(11) NOT NULL CHECK (`rating` between 1 and 5),
+  `review` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `reviews`
+--
+
+CREATE TABLE `reviews` (
+  `id` int(11) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `rating` int(11) NOT NULL CHECK (`rating` between 1 and 5),
+  `comment` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `staff`
+--
+
+CREATE TABLE `staff` (
+  `id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `password_hash` varchar(255) NOT NULL,
+  `role` varchar(50) DEFAULT 'delivery',
+  `phone` varchar(20) DEFAULT NULL,
+  `address` varchar(255) DEFAULT NULL,
+  `delivery_area` varchar(100) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `staff`
+--
+
+INSERT INTO `staff` (`id`, `name`, `email`, `password_hash`, `role`, `phone`, `address`, `delivery_area`, `created_at`) VALUES
+(1, 'Sherwin C Torrejas', 'sherwin@gmail.com', '$2y$10$XdcmFGsWHzuwQ6lInzyfU.Tvxt86NoLtqZ/tJHa9mEihsG0TBowxm', 'Inventory', '09224349105', 'Tuyan Minglanilla', '', '2026-02-13 12:21:16'),
+(2, 'Keith Clarence Aliporo', 'clarence@gmail.com', '$2y$10$Exbrlp23MY3SBZBM9Mfjk.SP2/Fs94aa8EgcdapbAsi2u4cR1AFoS', 'Support', '09683201419', 'taga ilaha', 'sa iyang gusto', '2026-02-18 12:38:32');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `staff_attendance`
+--
+
+CREATE TABLE `staff_attendance` (
+  `id` int(11) NOT NULL,
+  `staff_id` int(11) NOT NULL,
+  `time_in` datetime DEFAULT NULL,
+  `time_out` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `staff_attendance`
+--
+
+INSERT INTO `staff_attendance` (`id`, `staff_id`, `time_in`, `time_out`) VALUES
+(1, 2, '2026-02-18 20:39:24', '2026-02-19 18:21:03');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `support_tickets`
+--
+
+CREATE TABLE `support_tickets` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `user_name` varchar(100) NOT NULL,
+  `issue` text NOT NULL,
+  `reply` text DEFAULT NULL,
+  `status` varchar(50) DEFAULT 'Pending',
+  `assigned_to` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `support_tickets`
+--
+
+INSERT INTO `support_tickets` (`id`, `user_id`, `user_name`, `issue`, `reply`, `status`, `assigned_to`, `created_at`) VALUES
+(1, 7, 'harold', 'my order hasn\'t arrived yet, it surpass the expected delivery date', NULL, 'Pending', NULL, '2026-02-19 10:40:09'),
+(2, 7, 'harold', 'my order hasn\'t arrived yet, it surpass the expected delivery date', NULL, 'Pending', NULL, '2026-02-19 10:42:20'),
+(3, 6, 'kit', 'my orders hasn\'t arrived yet', NULL, 'Pending', NULL, '2026-02-19 10:49:30');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users`
+--
+
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL,
+  `username` varchar(50) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `password_hash` varchar(255) NOT NULL,
+  `role` enum('customer','admin') DEFAULT 'customer',
+  `street` varchar(255) NOT NULL,
+  `city` varchar(100) NOT NULL,
+  `province` varchar(100) NOT NULL,
+  `zip` varchar(20) DEFAULT NULL,
+  `birthday` date DEFAULT NULL,
+  `age` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `address` varchar(255) DEFAULT NULL,
+  `distance_km` int(11) NOT NULL DEFAULT 0,
+  `delivery_minutes` int(11) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `street`, `city`, `province`, `zip`, `birthday`, `age`, `created_at`, `address`, `distance_km`, `delivery_minutes`) VALUES
+(1, 'admin', 'admin@gmail.com', '$2y$10$KpnYr7b.otSD2THcddSUd.L6rZECMAqtqTkShcUhp77M3aC95ZpH2', 'admin', '', '', '', NULL, NULL, 0, '2026-02-09 10:42:05', NULL, 0, 0),
+(4, 'asd', 'dad@gmail.com', '$2y$10$WbpMBvoN8jLLox0prfpwIuhGJV4MZ9cZSHtZDxiLp0kQLQkH7d.I.', '', '', '', '', NULL, NULL, 0, '2026-02-11 09:26:48', NULL, 0, 0),
+(5, 'andre', 'andre@gmail.com', '$2y$10$ywqKIUcFxg40l74/o8nfGOHZEGAU0clDA2rtI8EfM5MIDavGmEeHa', '', 'Poblacion Ward IV', 'Minglanilla', 'Cebu', '6046', '2006-08-25', 19, '2026-02-11 12:37:16', NULL, 0, 0),
+(6, 'kit', 'kit@gmail.com', '$2y$10$cIutyxFJOgR4woMDKhvRQeHXY2/cYoCbX4FdlamnNuDaVEEnLqC1G', '', 'Ward IV', 'Minglanilla', 'Cebu', '6046', '2026-08-25', 0, '2026-02-12 09:42:18', NULL, 0, 0),
+(7, 'harold', 'harold@gmail.com', '$2y$10$oiY3IGWCbwejM2SDvOtFkexKiiGUm1tXOrLE/mkZiTmapUAdJFWX2', '', 'Tulay', 'Cebu City', 'Cebu', '41490', '2004-02-11', 22, '2026-02-12 11:55:04', NULL, 0, 0),
+(8, 'Sherwin', 'sherwin@gmail.com', '$2y$10$OCy3aedGaN2W.D6wOP/2GulNoclu2xB9l2v0KzefdZcl0mGoC.p0G', 'customer', 'Pob Ward IV', 'Minglanilla', 'Cebu', '6046', '2026-02-13', 0, '2026-02-13 06:39:55', NULL, 0, 0),
+(9, 'das', 'das@gmail.com', '$2y$10$/oC2cQlU3TClX716/TUl2evhjjXfUtm37uXdZ8B8WlrL.wmCPivyi', 'customer', 'Damian Brown', 'Danao', 'Bohol', '41490', '2026-02-09', 0, '2026-02-13 07:01:06', NULL, 75, 113),
+(10, 'jackdaniel', 'jackdaniel@gmail.com', '$2y$10$7TRTJ2ZwA2Czh7kfOM8FPuhZY5bWc1XSbmC/I7ylc8J.jg/DUmZua', 'customer', 'Calajoan', 'Minglanilla', 'Cebu', '4046', '2026-02-13', 0, '2026-02-13 09:01:55', NULL, 0, 0),
+(11, 'olinar', 'olinar@gmail.com', '$2y$10$VHtYKAFUp5mRUetREZFgPe5E4crjUJA73Sxdmw9jloX2BAfr7.eA.', 'customer', 'tulay', 'Danao', 'Bohol', '4046', '2026-02-13', 0, '2026-02-13 09:46:07', NULL, 75, 113),
+(12, 'jamero', 'jamero@gmail.com', '$2y$10$1iBrp6uzz./AKQSns2VMYeBqij2vjfYzeBUyl17yz2JH5J/tHzG1.', 'customer', 'cadulawant', 'Minglanilla', 'Cebu', '6046', '2004-07-06', 21, '2026-02-16 09:58:38', NULL, 0, 0),
+(13, 'grace tutor', 'grace@gmail.com', '$2y$10$68QiCwWR/0MrP5k0FQucH.2A4vajJ05rI5814ayk5MC9jdrN.Ol0m', 'customer', 'casa mira ', 'Minglanilla', 'Cebu', '41490', '1992-07-04', 33, '2026-02-16 10:34:14', NULL, 0, 0);
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `categories`
+--
+ALTER TABLE `categories`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `name` (`name`);
+
+--
+-- Indexes for table `inventory`
+--
+ALTER TABLE `inventory`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `product_id` (`product_id`);
+
+--
+-- Indexes for table `orders`
+--
+ALTER TABLE `orders`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `product_id` (`product_id`),
+  ADD KEY `staff_id` (`staff_id`);
+
+--
+-- Indexes for table `order_items`
+--
+ALTER TABLE `order_items`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `order_id` (`order_id`),
+  ADD KEY `product_id` (`product_id`);
+
+--
+-- Indexes for table `products`
+--
+ALTER TABLE `products`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `category_id` (`category_id`);
+
+--
+-- Indexes for table `product_reviews`
+--
+ALTER TABLE `product_reviews`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `product_id` (`product_id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `reviews`
+--
+ALTER TABLE `reviews`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `product_id` (`product_id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `staff`
+--
+ALTER TABLE `staff`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `email` (`email`);
+
+--
+-- Indexes for table `staff_attendance`
+--
+ALTER TABLE `staff_attendance`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `staff_id` (`staff_id`);
+
+--
+-- Indexes for table `support_tickets`
+--
+ALTER TABLE `support_tickets`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `username` (`username`),
+  ADD UNIQUE KEY `email` (`email`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `categories`
+--
+ALTER TABLE `categories`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+
+--
+-- AUTO_INCREMENT for table `inventory`
+--
+ALTER TABLE `inventory`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `orders`
+--
+ALTER TABLE `orders`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+
+--
+-- AUTO_INCREMENT for table `order_items`
+--
+ALTER TABLE `order_items`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `products`
+--
+ALTER TABLE `products`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT for table `product_reviews`
+--
+ALTER TABLE `product_reviews`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `reviews`
+--
+ALTER TABLE `reviews`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `staff`
+--
+ALTER TABLE `staff`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `staff_attendance`
+--
+ALTER TABLE `staff_attendance`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `support_tickets`
+--
+ALTER TABLE `support_tickets`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `users`
+--
+ALTER TABLE `users`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `inventory`
+--
+ALTER TABLE `inventory`
+  ADD CONSTRAINT `inventory_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `orders`
+--
+ALTER TABLE `orders`
+  ADD CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `orders_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `orders_ibfk_3` FOREIGN KEY (`staff_id`) REFERENCES `staff` (`id`);
+
+--
+-- Constraints for table `order_items`
+--
+ALTER TABLE `order_items`
+  ADD CONSTRAINT `order_items_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `products`
+--
+ALTER TABLE `products`
+  ADD CONSTRAINT `products_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `product_reviews`
+--
+ALTER TABLE `product_reviews`
+  ADD CONSTRAINT `product_reviews_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`),
+  ADD CONSTRAINT `product_reviews_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+
+--
+-- Constraints for table `reviews`
+--
+ALTER TABLE `reviews`
+  ADD CONSTRAINT `reviews_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `reviews_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `staff_attendance`
+--
+ALTER TABLE `staff_attendance`
+  ADD CONSTRAINT `staff_attendance_ibfk_1` FOREIGN KEY (`staff_id`) REFERENCES `staff` (`id`) ON DELETE CASCADE;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
