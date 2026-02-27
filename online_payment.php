@@ -115,18 +115,19 @@ button[value="paypal"]:hover {background: rgba(59,130,246,1);transform:translate
     <?php endforeach; ?>
 
     <div class="summary">
-        <div class="row"><span>Subtotal</span><span>₱<?= number_format($total,2); ?></span></div>
+        <div class="row"><span>Subtotal</span><span>€<?= number_format($total,2); ?></span></div>
         <?php if($birthday_discount>0): ?>
-        <div class="row"><span>🎉 Birthday Discount</span><span>-₱<?= number_format($discount_amount,2); ?></span></div>
+        <div class="row"><span>🎉 Birthday Discount</span><span>-€<?= number_format($discount_amount,2); ?></span></div>
         <?php endif; ?>
-        <div class="row"><strong>Total</strong><strong>₱<?= number_format($total_after_discount,2); ?></strong></div>
+        <div class="row"><strong>Total</strong><strong>€<?= number_format($total_after_discount,2); ?></strong></div>
     </div>
 
-    <form method="POST" action="final_payment.php">
-        <input type="hidden" name="total_price" value="<?= $total_after_discount; ?>">
-        <button type="submit" name="method" value="gcash">Pay with GCash</button>
-        <button type="submit" name="method" value="paypal">Pay with PayPal</button>
-    </form>
+<form method="POST" action="final_payment.php">
+    <input type="hidden" name="total_price" value="<?= $total_after_discount; ?>">
+    <button type="submit" name="method" value="gcash">Pay with GCash</button>
+    <button type="submit" name="method" value="paypal">Pay with PayPal</button>
+   
+</form>
 
     <a href="cart.php" class="cancel-btn" onclick="return confirm('Cancel checkout and go back to cart?')">Cancel Order</a>
 </div>

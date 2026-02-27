@@ -582,8 +582,8 @@ textarea:focus{
             <img src="<?= htmlspecialchars($img) ?>" alt="Product Image">
             <div class="cart-details">
                 <div class="cart-name"><?= htmlspecialchars($item['name']) ?></div>
-                <div class="cart-meta">₱<span class="price"><?= number_format($item['price'],2) ?></span> each</div>
-                <div class="item-total">Total: ₱<span><?= number_format($item['price']*$item['quantity'],2) ?></span></div>
+                <div class="cart-meta">€<span class="price"><?= number_format($item['price'],2) ?></span> each</div>
+                <div class="item-total">Total: €<span><?= number_format($item['price']*$item['quantity'],2) ?></span></div>
                 <div class="qty-controls">
                     <button type="button" class="qty-btn" data-action="decrease" data-id="<?= $id ?>">-</button>
                     <div class="qty-number"><?= (int)$item['quantity'] ?></div>
@@ -601,11 +601,11 @@ textarea:focus{
         <?php endforeach; ?>
 
         <div class="summary">
-            <div class="summary-row">Subtotal: <span id="selectedSubtotal">₱0.00</span></div>
+            <div class="summary-row">Subtotal: <span id="selectedSubtotal">€0.00</span></div>
             <?php if($birthday_discount>0): ?>
-            <div class="summary-row discount-msg">Birthday Discount: <span id="selectedDiscount">- ₱0.00</span></div>
+            <div class="summary-row discount-msg">Birthday Discount: <span id="selectedDiscount">- €0.00</span></div>
             <?php endif; ?>
-            <div class="summary-row"><strong>Total After Discount:</strong> <strong id="selectedTotalAfter">₱0.00</strong></div>
+            <div class="summary-row"><strong>Total After Discount:</strong> <strong id="selectedTotalAfter">€0.00</strong></div>
         </div>
     </form>
     <?php endif; ?>
@@ -633,16 +633,16 @@ function recalcSelectedTotal(){
     let subtotal = 0;
     document.querySelectorAll(".itemCheck:checked").forEach(chk=>{
         const div = chk.closest(".cart-item");
-        const price = parseFloat(div.querySelector(".price").innerText.replace(/[₱,]/g,'')) || 0;
+        const price = parseFloat(div.querySelector(".price").innerText.replace(/[€,]/g,'')) || 0;
         const qty = parseInt(div.querySelector(".qty-number").innerText) || 1;
         subtotal += price*qty;
     });
     const discount = (birthdayDiscount/100)*subtotal;
     const total = subtotal - discount;
-    document.getElementById("selectedSubtotal").innerText = '₱' + subtotal.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+    document.getElementById("selectedSubtotal").innerText = '€' + subtotal.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
     const discEl = document.getElementById("selectedDiscount");
-    if(discEl) discEl.innerText = '- ₱' + discount.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
-    document.getElementById("selectedTotalAfter").innerText = '₱' + total.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+    if(discEl) discEl.innerText = '- €' + discount.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+    document.getElementById("selectedTotalAfter").innerText = '€' + total.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
 }
 // INDIVIDUAL CHECKBOX CHANGE
 document.addEventListener("change", function(e){
@@ -686,10 +686,10 @@ document.addEventListener("click", async function(e){
             itemDiv.querySelector(".item-total span").innerText = data.item_total.toFixed(2);
         }
 
-        document.getElementById("selectedSubtotal").innerText='₱'+data.subtotal.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+        document.getElementById("selectedSubtotal").innerText='€'+data.subtotal.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
         const discEl=document.getElementById("selectedDiscount");
-        if(discEl) discEl.innerText='- ₱'+data.discount.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
-        document.getElementById("selectedTotalAfter").innerText='₱'+data.total_after.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+        if(discEl) discEl.innerText='- €'+data.discount.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+        document.getElementById("selectedTotalAfter").innerText='€'+data.total_after.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
     } catch(err){
         console.error("AJAX error:", err);
     }

@@ -7,7 +7,7 @@ header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 header("Expires: 0");
 
-// Redirect to login if not logged in
+// Redirect if not logged in
 if(!isset($_SESSION['user_id'])){
     header("Location: login.php");
     exit;
@@ -19,8 +19,20 @@ $username = $_SESSION['username'] ?? 'User';
 
 include("computer.php");
 
-// Fetch products
+// Fetch all products
 $products_result = $conn->query("SELECT * FROM products ORDER BY id DESC");
+$products_array = [];
+while($row = $products_result->fetch_assoc()){
+    $products_array[] = $row;
+}
+
+// Pagination setup
+$per_page = 12;
+$page = isset($_GET['page']) ? max(1,(int)$_GET['page']) : 1;
+$total_products = count($products_array);
+$total_pages = ceil($total_products / $per_page);
+$start_index = ($page - 1) * $per_page;
+$products_page = array_slice($products_array, $start_index, $per_page);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -29,35 +41,36 @@ $products_result = $conn->query("SELECT * FROM products ORDER BY id DESC");
 <title>CREATECH Store</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-/* BODY & BACKGROUND */
 body {margin:0;font-family:'Segoe UI',sans-serif;color:#fff;background:#0f172a;}
 #bg-video {position:fixed;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:-2;filter:brightness(0.35);}
 .video-overlay {position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.55);z-index:-1;}
 
-/* HEADER */
 header {
-    background:rgba(15,23,42,0.75);
-    padding:15px 30px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    position:sticky;
-    top:0;
-    backdrop-filter:blur(10px);
-    z-index:999;
+    background: rgba(15,23,42,0.75);
+    padding: 15px 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    backdrop-filter: blur(10px);
+    z-index: 999;
 }
-header a {color:#22c55e;text-decoration:none;margin-left:15px;font-weight:bold;}
-header a:hover {opacity:0.8;}
+
 .logo {
     font-size: 24px;
     font-weight: 900;
     letter-spacing: 2px;
-    background: linear-gradient(90deg, #2e7738, #2cbb43,  #00ff73);
+    background: linear-gradient(90deg, #2e7738, #2cbb43, #00ff73);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
-/* SECTION WRAPPER */
+.center-nav {position: absolute; left: 50%; transform: translateX(-50%);}
+.center-nav nav {display: flex; gap: 20px;}
+nav a {color: #22c55e; text-decoration: none; font-weight: bold;}
+nav a:hover {opacity:0.8;}
+
 .section{
     max-width:1200px;
     margin:0 auto;
@@ -68,9 +81,57 @@ header a:hover {opacity:0.8;}
     gap:25px;
 }
 
-/* PRODUCT CARD USING FORM-CONTAINER STYLE */
+.search-container {
+    position: absolute;
+    right: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #22c55e;
+    z-index: 1000;
+}
+
+.search-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  z-index: 1001;
+}
+
+.search-icon svg {width: 60%; height: 60%; stroke: currentColor; fill: none;}
+
+.search-input {
+  width: 0;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 50px;
+  border: none;
+  outline: none;
+  background-color: #0f172a;
+  color: #ffffff;
+  box-shadow: 1.5px 1.5px 3px #0e0e0e,
+              -1.5px -1.5px 3px rgb(95 94 94 / 25%),
+              inset 0 0 0 #0e0e0e,
+              inset 0 -0 0 #5f5e5e;
+  transition: width 0.3s ease, margin-left 0.3s ease;
+  cursor: pointer;
+}
+
+.search-container.active .search-input,
+.search-input:focus {
+  width: 200px;
+  margin-left: 8px;
+  cursor: text;
+}
+
 .product.form-container {
-    width: 300px; /* keep the size */
+    width: 300px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -89,6 +150,7 @@ header a:hover {opacity:0.8;}
     backdrop-filter:blur(10px);
     text-decoration: none;
 }
+
 .product.form-container:hover{
     transform: translateY(-6px);
     border: 2px solid #13b61b;
@@ -124,7 +186,35 @@ header a:hover {opacity:0.8;}
     font-weight:900;
 }
 
-/* SMALL RESPONSIVE FIX */
+.pagination {
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:8px;
+    margin:20px 0;
+}
+
+.pagination button {
+    padding:8px 12px;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    background:#1e293b;
+    color:#fff;
+    font-weight:600;
+    transition:0.3s;
+}
+
+.pagination button.active {
+    background:#22c55e;
+    color:#0f172a;
+}
+
+.pagination button:hover:not(.active) {
+    background:#13b61b;
+    color:#fff;
+}
+
 @media(max-width:600px){
     header{padding:12px 15px;}
     .logo{font-size:22px;}
@@ -141,35 +231,131 @@ header a:hover {opacity:0.8;}
 
 <header>
     <div class="logo">CREATECH</div>
-    <nav>
-        <span class="logo" style="font-size:18px;">Hello, <?= htmlspecialchars($username) ?></span>
+
+    <div class="center-nav">
         <?php if($user_role !== 'admin'): ?>
-            <a href="cart.php" class="logo" style="font-size:18px;">Cart 🛒</a>
-            <a href="create_ticket.php" class="logo" style="font-size:18px;">Support</a>
-            <a href="purchases.php" class="logo" style="font-size:18px;">Purchases</a>
-            <a href="logout.php" class="logo" style="font-size:18px;">Logout</a>
+        <nav>
+            <a href="cart.php">Cart 🛒</a>
+            <a href="create_ticket.php">Support</a>
+            <a href="purchases.php">Purchases</a>
+            <a href="logout.php">Logout</a>
+        </nav>
         <?php endif; ?>
-    </nav>
+    </div>
+
+    <div class="search-container">
+        <div class="search-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                <title>Search</title>
+                <path d="M221.09 64a157.09 157.09 0 10157.09 157.09A157.1 157.1 0 00221.09 64z"
+                      fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/>
+                <path fill="none" stroke="currentColor" stroke-linecap="round"
+                      stroke-miterlimit="10" stroke-width="32" d="M338.29 338.29L448 448"/>
+            </svg>
+        </div>
+        <input type="text" class="search-input" placeholder="Search by name or category...">
+    </div>
 </header>
 
-<div class="section">
-    <?php while($product = $products_result->fetch_assoc()): ?>
-        <a href="product.php?id=<?= $product['id'] ?>" class="product form-container">
-            <img src="<?= htmlspecialchars($product['image_url'] ?: 'assets/placeholder.jpg') ?>" alt="Product">
-            <h4><?= htmlspecialchars($product['name']) ?></h4>
-            <p><?= htmlspecialchars(substr($product['description'],0,70)) ?>...</p>
-            <strong>₱<?= number_format($product['price'],2) ?></strong>
-        </a>
-    <?php endwhile; ?>
-</div>
+<!-- Pagination Top -->
+<div class="pagination" id="pagination-top"></div>
+
+<!-- Products Section -->
+<div class="section" id="product-section"></div>
+
+<!-- Pagination Bottom -->
+<div class="pagination" id="pagination-bottom"></div>
 
 <script>
-// Force reload if page is loaded from cache
+// Reload if cached
 window.onpageshow = function(event) {
     if (event.persisted || window.performance && window.performance.navigation.type === 2) {
         window.location.reload();
     }
 };
+
+const searchContainer = document.querySelector('.search-container');
+const searchInput = document.querySelector('.search-input');
+const searchIcon = document.querySelector('.search-icon');
+
+const allProductsRaw = <?= json_encode($products_array) ?>;
+const perPage = <?= $per_page ?>;
+let currentPage = <?= $page ?>;
+
+const productSection = document.getElementById('product-section');
+const paginationTop = document.getElementById('pagination-top');
+const paginationBottom = document.getElementById('pagination-bottom');
+
+function getPaginatedProducts(products, page){
+    const start = (page-1) * perPage;
+    return products.slice(start, start+perPage);
+}
+
+function renderProducts(products){
+    productSection.innerHTML = '';
+    if(products.length===0){
+        productSection.innerHTML=`<p style="color:#fff;font-size:18px;">No products found.</p>`;
+        paginationTop.innerHTML='';
+        paginationBottom.innerHTML='';
+        return;
+    }
+    products.forEach(p=>{
+        const a=document.createElement('a');
+        a.href=`product.php?id=${p.id}`;
+        a.className='product form-container';
+        a.innerHTML=`<img src="${p.image_url||'assets/placeholder.jpg'}" alt="Product">
+            <h4>${p.name}</h4>
+            <p>${p.description.substring(0,70)}...</p>
+            <strong>€${Number(p.price).toFixed(2)}</strong>`;
+        productSection.appendChild(a);
+    });
+    renderPagination(allProductsRaw);
+}
+
+function renderPagination(products){
+    const totalPages = Math.ceil(products.length / perPage);
+    const build = (container) => {
+        container.innerHTML='';
+        for(let i=1;i<=totalPages;i++){
+            const btn = document.createElement('button');
+            btn.textContent = i;
+            if(i===currentPage) btn.classList.add('active');
+            btn.addEventListener('click', ()=> {
+                currentPage=i;
+                renderProducts(getPaginatedProducts(products,i));
+            });
+            container.appendChild(btn);
+        }
+    }
+    build(paginationTop);
+    build(paginationBottom);
+}
+
+// Initial render
+renderProducts(getPaginatedProducts(allProductsRaw,currentPage));
+
+// Toggle search input
+searchIcon.addEventListener('click', () => {
+    if(searchContainer.classList.contains('active')){
+        searchContainer.classList.remove('active');
+        searchInput.value='';
+        searchInput.blur();
+        currentPage=1;
+        renderProducts(getPaginatedProducts(allProductsRaw,currentPage));
+    } else {
+        searchContainer.classList.add('active');
+        searchInput.focus();
+    }
+});
+
+// Live search
+searchInput.addEventListener('input',()=>{
+    const query = searchInput.value.trim().toLowerCase();
+    let filtered = allProductsRaw.filter(p=> p.name.toLowerCase().includes(query) || p.description.toLowerCase().includes(query));
+    currentPage=1;
+    renderProducts(getPaginatedProducts(filtered,currentPage));
+});
 </script>
+
 </body>
 </html>
